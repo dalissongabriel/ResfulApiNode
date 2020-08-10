@@ -8,7 +8,14 @@ module.exports = {
             const query = knex('projects')
             if(user_id){
                 query
-                    .select('projects.*','users.username')
+                    .select(
+                        'projects.id',
+                        'projects.title',
+                        'projects.user_id',
+                        'users.username',
+                        'projects.created_at',
+                        'projects.updated_at'
+                        )
                     .join('users','users.id','=','projects.user_id')
                     .where({user_id})
 
