@@ -27,7 +27,7 @@ module.exports = {
             next(error)
         }
     },
-    async delete(req,res,next) {
+    async delete(req,res,next) {    
         try {
             const { id } =  req.params
             await knex('users')
