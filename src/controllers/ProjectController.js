@@ -1,11 +1,12 @@
 const knex = require("../database")
-const { andWhereRaw } = require("../database")
 
 module.exports = {
     async index(req,res, next) {
         try {
-            const { user_id } = req.query
+            const { user_id, page = 1 } = req.query
             const query = knex('projects')
+                .limit(5)
+                .offset( (page - 1) * 5)
             if(user_id){
                 query
                     .select(
@@ -18,10 +19,22 @@ module.exports = {
                         )
                     .join('users','users.id','=','projects.user_id')
                     .where({user_id})
-
             }
+
+            const [count] = await knex('projects').count()
+            res.header('X-Total-Count', count["count"])
+
             const results = await query
             return res.json(results)
+        } catch (error) {
+            next(error)
+        }
+    },
+    async show(req, res, next) {
+        try {
+            const { id } = req.params
+            const results = await knex('projects').where({id})
+            return res.json(results)    
         } catch (error) {
             next(error)
         }
