@@ -5,9 +5,14 @@ module.exports = {
         try {
             const { user_id, page = 1 } = req.query
             const query = knex('projects')
+                .join('users','users.id','=','projects.user_id')
+                .where('users.deleted_at',null)                
                 .limit(5)
                 .offset( (page - 1) * 5)
-            const countObj = knex('projects').count()
+            const countObj = knex('projects')
+                .count()
+                .join('users','users.id','=','projects.user_id')
+                .where('users.deleted_at',null)
 
             if(user_id){
                 query
@@ -21,6 +26,7 @@ module.exports = {
                         )
                     .join('users','users.id','=','projects.user_id')
                     .where({user_id})
+                    .andWhere('users.deleted_at',null)
 
                 countObj.where({user_id})
             }
@@ -36,7 +42,12 @@ module.exports = {
     async show(req, res, next) {
         try {
             const { id } = req.params
-            const results = await knex('projects').where({id})
+            const results = await 
+                knex('projects')
+                .join('users','users.id','=','projects.user_id')
+                .where('projects.id',id)
+                .andWhere('users.deleted_at',null)
+
             return res.json(results)    
         } catch (error) {
             next(error)

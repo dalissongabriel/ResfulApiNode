@@ -5,12 +5,13 @@ module.exports = {
         try {
             const {username, page = 1} = req.query
             const query = knex('users')
+                .where('deleted_at', null)
                 .limit(5)
                 .offset((page - 1) * 5)
             if(username) {
                 query.where({username})
             }
-            const [count] = await knex('users').count()
+            const [count] = await knex('users').where('deleted_at',null).count()
             res.header('X-Total-Count', count["count"])
             const results = await query
             
@@ -56,7 +57,7 @@ module.exports = {
             const { id } =  req.params
             await knex('users')
                 .where( {id} )
-                .del()
+                .update('deleted_at', new Date())
             return res.send()
         } catch (error) {
             next(error)
